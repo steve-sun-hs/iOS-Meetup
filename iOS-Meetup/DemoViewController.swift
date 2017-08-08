@@ -4,14 +4,10 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class DemoViewController: UIViewController, UITextFieldDelegate {
+class DemoViewController: UIViewController {
 
     @IBOutlet weak var textField: UITextField!
-    @IBOutlet weak var characterCountLabel: UILabel! {
-        didSet {
-            characterCountLabel.text = String(DemoViewModel.maximumFacebookCharacterCount)
-        }
-    }
+    @IBOutlet weak var characterCountLabel: UILabel!
     @IBOutlet weak var sendButton: UIBarButtonItem!
 
     private let viewModel = DemoViewModel()
@@ -24,9 +20,7 @@ class DemoViewController: UIViewController, UITextFieldDelegate {
 
     private func setupRx() {
         textField.rx.text
-            .asObservable()
-            .asDriver(onErrorJustReturn: "")
-            .drive(onNext: { [weak self] text in
+            .subscribe(onNext: { [weak self] text in
                 if let text = text {
                     self?.viewModel.textDidUpdate(text: text)
                 }
@@ -36,13 +30,11 @@ class DemoViewController: UIViewController, UITextFieldDelegate {
         viewModel.remainingCharacters
             .asObservable()
             .asDriver(onErrorJustReturn: 0)
-            .drive(onNext: { [weak self] remainingCharacters in
-                self?.characterCountLabel.text = String(remainingCharacters)
-            })
+            .map { String($0) }
+            .drive(characterCountLabel.rx.text)
             .addDisposableTo(disposeBag)
 
         viewModel.shouldEnableSendButton
-            .asObservable()
             .asDriver(onErrorJustReturn: false)
             .drive(sendButton.rx.isEnabled)
             .addDisposableTo(disposeBag)
