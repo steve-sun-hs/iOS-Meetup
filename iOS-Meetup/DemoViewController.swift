@@ -20,12 +20,9 @@ class DemoViewController: UIViewController {
 
     private func setupRx() {
         textField.rx.text
-            .subscribe(onNext: { [weak self] text in
-                if let text = text {
-                    self?.viewModel.textDidUpdate(text: text)
-                }
-
-            }).addDisposableTo(disposeBag)
+            .map { $0 ?? "" }
+            .bindTo(viewModel.message)
+            .addDisposableTo(disposeBag)
 
         viewModel.remainingCharacters
             .asObservable()

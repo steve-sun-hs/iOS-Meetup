@@ -10,8 +10,8 @@ class DemoViewModel {
 
     var remainingCharacters: Variable<Int> = Variable(DemoViewModel.maximumFacebookCharacterCount)
     var shouldEnableSendButton: BehaviorSubject<Bool> = BehaviorSubject(value: false)
+    var message: Variable<String> = Variable("")
 
-    private var message: Variable<String> = Variable("")
     private let disposeBag = DisposeBag()
 
     init() {
@@ -21,18 +21,15 @@ class DemoViewModel {
     private func setupRx() {
         Observable.combineLatest(message.asObservable(), remainingCharacters.asObservable()) { message, remaining -> Bool in
             return !message.isEmpty && remaining >= 0
-        }
-        .bindTo(shouldEnableSendButton)
-        .addDisposableTo(disposeBag)
-    }
+            }
+            .bindTo(shouldEnableSendButton)
+            .addDisposableTo(disposeBag)
 
-    func textDidUpdate(text: String) {
-        message.value = text
-        remainingCharacters.value = calculateRemainingCharacters(text: text)
-    }
-
-    private func calculateRemainingCharacters(text: String) -> Int {
-        return DemoViewModel.maximumFacebookCharacterCount - text.characters.count
+        message
+            .asObservable()
+            .map { DemoViewModel.maximumFacebookCharacterCount - $0.characters.count }
+            .bindTo(remainingCharacters)
+            .addDisposableTo(disposeBag)
     }
 
 }
