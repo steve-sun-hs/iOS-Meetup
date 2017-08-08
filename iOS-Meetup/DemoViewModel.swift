@@ -8,7 +8,7 @@ class DemoViewModel {
 
     static let maximumFacebookCharacterCount = 10
 
-    var remainingCharacters: Variable<Int> = Variable(DemoViewModel.maximumFacebookCharacterCount)
+    var remainingCharacters: BehaviorSubject<Int> = BehaviorSubject(value: DemoViewModel.maximumFacebookCharacterCount)
     var shouldEnableSendButton: BehaviorSubject<Bool> = BehaviorSubject(value: false)
     var message: Variable<String> = Variable("")
 
@@ -31,5 +31,5 @@ class DemoViewModel {
             .bindTo(remainingCharacters)
             .addDisposableTo(disposeBag)
     }
-
+    
 }

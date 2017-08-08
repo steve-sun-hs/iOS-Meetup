@@ -25,7 +25,6 @@ class DemoViewController: UIViewController {
             .addDisposableTo(disposeBag)
 
         viewModel.remainingCharacters
-            .asObservable()
             .asDriver(onErrorJustReturn: 0)
             .map { String($0) }
             .drive(characterCountLabel.rx.text)
